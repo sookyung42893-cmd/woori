@@ -109,10 +109,10 @@ const SCENARIO_POOL = [
     },
     B2: {
       a: [
-        { type: 'empathy',   slot: 'a', text: '고마워. 나 오늘 진짜 방전됐어.' },
-        { type: 'empathy',   slot: 'b', text: '응, 빨리 끝내자.' },
-        { type: 'avoidance', slot: 'c', text: '아니야, 내가 할게.' },
-        { type: 'avoidance', slot: 'd', text: '같이 안 해도 돼.' },
+        { type: 'empathy',   slot: 'a', text: '그러자. 나 씻을게.' },
+        { type: 'avoidance', slot: 'b', text: '응.' },
+        { type: 'empathy',   slot: 'c', text: '미안, 내가 먼저 할게.' },
+        { type: 'avoidance', slot: 'd', text: '됐어, 내가 할게.' },
       ],
       b: [
         { type: 'empathy',   slot: 'a', text: '응, 금방 할게. 기다려줘.' },
@@ -121,10 +121,10 @@ const SCENARIO_POOL = [
         { type: 'criticism', slot: 'd', text: '이제야 말하네.' },
       ],
       c: [
-        { type: 'empathy',   slot: 'a', text: '그러자. 나 씻을게.' },
-        { type: 'avoidance', slot: 'b', text: '응.' },
-        { type: 'empathy',   slot: 'c', text: '미안, 내가 먼저 할게.' },
-        { type: 'avoidance', slot: 'd', text: '됐어, 내가 할게.' },
+        { type: 'empathy',   slot: 'a', text: '고마워. 나 오늘 진짜 방전됐어.' },
+        { type: 'empathy',   slot: 'b', text: '응, 빨리 끝내자.' },
+        { type: 'avoidance', slot: 'c', text: '아니야, 내가 할게.' },
+        { type: 'avoidance', slot: 'd', text: '같이 안 해도 돼.' },
       ],
       d: [
         { type: 'empathy',   slot: 'a', text: '맞아, 미안해. 다음엔 미리 할게.' },
@@ -244,7 +244,7 @@ const SCENARIO_POOL = [
         { type: 'criticism', slot: 'd', text: '곧이 몇 시간이야.' },
       ],
       c: [
-        { type: 'empathy',   slot: 'a', text: '그렇구나. 재밌어? 조심히 와.' },
+        { type: 'empathy',   slot: 'a', text: '그냥 좀 걱정돼서 그랬어.' },
         { type: 'avoidance', slot: 'b', text: '알겠어, 기다릴게.' },
         { type: 'empathy',   slot: 'c', text: '언제쯤 올 것 같아?' },
         { type: 'criticism', slot: 'd', text: '그럼 미리 말하지.' },
@@ -270,8 +270,8 @@ const SCENARIO_POOL = [
         { type: 'avoidance', slot: 'd', text: '알아서 해.' },
       ],
       c: [
-        { type: 'empathy',   slot: 'a', text: '응, 조심히 갈게. 기다려줘서 고마워.' },
-        { type: 'avoidance', slot: 'b', text: '어, 알겠어.' },
+        { type: 'empathy',   slot: 'a', text: '응, 먹었어. 미안, 다음엔 꼭 연락할게.' },
+        { type: 'avoidance', slot: 'b', text: '거의 다 왔어.' },
         { type: 'empathy',   slot: 'c', text: '미안.' },
         { type: 'avoidance', slot: 'd', text: '알아서 해.' },
       ],
@@ -339,104 +339,148 @@ const SCENARIO_POOL = [
 
   {
     id: 'drinks',
-    difficulty: 3,
+    difficulty: 2,
     title: '친구와의 술자리',
     icon: '🍻',
     desc: '상대의 사회적 관계와 자유를 인정할지 고민되는 상황',
     room: { key: 'bathroom', label: '욕실', icon: '🛁', statKey: 'boundary' },
     bg: 'bg_bathroom.png',
-    situation: n => `${n.B}가 오랜만에 친구들과 저녁에 술 한잔 하고 오겠다고 말했어요. ${n.A}는 갑자기 불안한 마음이 들어요.`,
+    situation: n => `${n.B}가 친구들이랑 저녁을 먹으러 간다고 말했어요. ${n.A}는 오늘 같이 있고 싶었어요.`,
     A1: [
-      { type: 'empathy',   text: '오랜만에 친구들 보는구나, 재밌게 놀다 와.' },
-      { type: 'criticism', text: '오늘은 가지 말고 그냥 나랑 있자.' },
-      { type: 'avoidance', text: '...(서운한 표정으로 아무 말 안 한다)' },
+      { type: 'empathy',   slot: 'a', text: '나 오늘 같이 있고 싶었는데. 꼭 가야 해?' },
+      { type: 'avoidance', slot: 'b', text: '오늘 친구 만나는 거야?' },
+      { type: 'empathy',   slot: 'c', text: '나도 데려가면 안 돼?' },
+      { type: 'criticism', slot: 'd', text: '또 나 두고 가는 거야?' },
     ],
     B1: {
-      empathy: [
-        { type: 'empathy',   text: '고마워! 너무 늦지 않게 올게.' },
-        { type: 'criticism', text: '진짜 괜찮아? 표정이 좀 그런데...' },
-        { type: 'avoidance', text: '응... (눈치를 보며 가방을 챙긴다)' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '그랬구나. 오래된 친구라. 다녀와서 같이 있자.' },
+        { type: 'empathy',   slot: 'b', text: '오래된 친구라서. 미안.' },
+        { type: 'avoidance', slot: 'c', text: '꼭 가야 해서.' },
+        { type: 'criticism', slot: 'd', text: '꼭 같이 있어야 해?' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '음... 무슨 일이야? 갑자기 왜 그래?' },
-        { type: 'criticism', text: '왜? 친구들도 오랜만인데, 갑자기 그러는 게 어디 있어.' },
-        { type: 'avoidance', text: '...(약속 시간이 다 됐는데 어쩌지 망설인다)' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '응, 오랜만에. 너 괜찮아?' },
+        { type: 'avoidance', slot: 'b', text: '응, 왜?' },
+        { type: 'avoidance', slot: 'c', text: '응.' },
+        { type: 'criticism', slot: 'd', text: '왜? 뭔가 할 말 있어?' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '표정이 왜 그래? 가지 말까?' },
-        { type: 'criticism', text: '말을 해야 알지, 그렇게 있으면 나도 모르잖아.' },
-        { type: 'avoidance', text: '...그럼 나도 그냥 집에 있을까...' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '오늘은 좀 오래된 친구들이라. 다음엔 같이 가자.' },
+        { type: 'avoidance', slot: 'b', text: '그건 좀… 오늘은 어렵겠다.' },
+        { type: 'avoidance', slot: 'c', text: '오늘은 좀 힘들 것 같아.' },
+        { type: 'criticism', slot: 'd', text: '친구 만나는 데 왜 같이 가.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '나 두고 가는 게 아니야. 친구도 만나야 하잖아.' },
+        { type: 'criticism', slot: 'b', text: '맨날은 아니잖아.' },
+        { type: 'empathy',   slot: 'c', text: '그렇게 말하면 서운하다.' },
+        { type: 'criticism', slot: 'd', text: '허락 받아야 해?' },
       ],
     },
     A2: {
-      empathy: [
-        { type: 'empathy',   text: '응, 진짜 괜찮아. 친구들이랑 시간 보내는 것도 중요하잖아.' },
-        { type: 'criticism', text: '괜찮긴 한데... 너무 늦게 오진 마.' },
-        { type: 'avoidance', text: '...아니야, 다녀와.' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '그래, 재밌게 다녀와. 다녀와서 얘기 들려줘.' },
+        { type: 'avoidance', slot: 'b', text: '응, 빨리 와.' },
+        { type: 'empathy',   slot: 'c', text: '오늘 같이 있고 싶었어, 솔직히.' },
+        { type: 'criticism', slot: 'd', text: '다녀와서 같이 있으면 뭐가 달라.' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '미안, 그냥 같이 있고 싶은 마음이 너무 커서 그랬어. 다녀와.' },
-        { type: 'criticism', text: '오랜만이라고? 나랑 있는 시간은 항상 있어서 괜찮은 거야?' },
-        { type: 'avoidance', text: '...그래, 가, 가라고.' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '아니야, 다녀와. 다음엔 같이 나가자.' },
+        { type: 'avoidance', slot: 'b', text: '응.' },
+        { type: 'empathy',   slot: 'c', text: '나도 같이 가고 싶었어.' },
+        { type: 'criticism', slot: 'd', text: '맨날 미안만 하면 뭐가 달라.' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '아니, 가지 말라는 게 아니라... 그냥 오늘은 좀 같이 있고 싶었어.' },
-        { type: 'criticism', text: '됐어, 가고 싶으면 가. 신경 쓰지 마.' },
-        { type: 'avoidance', text: '...아니, 됐어. 다녀와.' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '응, 그래. 다음엔 같이 가자.' },
+        { type: 'avoidance', slot: 'b', text: '알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '다음엔 나도 같이 가고 싶어.' },
+        { type: 'criticism', slot: 'd', text: '맨날 어렵다고 하면 언제 같이 가.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '허락이 아니라 같이 있고 싶다는 거야.' },
+        { type: 'avoidance', slot: 'b', text: '…됐어, 다녀와.' },
+        { type: 'criticism', slot: 'c', text: '왜 그렇게 말해.' },
+        { type: 'criticism', slot: 'd', text: '그럼 나도 혼자 살게.' },
       ],
     },
     B2: {
-      empathy: {
-        empathy: [
-          { type: 'empathy',   text: '고마워. 다녀와서 같이 시간 보내자, 오늘은 잠깐만 보고 올게.' },
-          { type: 'criticism', text: '늦게 오지 말라는 말, 좀 부담스럽다...' },
-          { type: 'avoidance', text: '...응, 그럴게.' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '그래, 너무 늦지 않게 올게. 걱정 안 해도 돼.' },
-          { type: 'criticism', text: '괜찮다면서 또 그렇게 말하면 나도 부담스러워.' },
-          { type: 'avoidance', text: '...응, 알겠어.' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...진짜 괜찮은 거지? 표정이 좀 그런데.' },
-          { type: 'criticism', text: '다녀오라면서 표정은 왜 그래.' },
-          { type: 'avoidance', text: '...그래, 다녀올게.' },
-        ],
-      },
-      criticism: {
-        empathy: [
-          { type: 'empathy',   text: '아니야, 너랑 있는 시간도 소중해. 오늘만 잠깐 다녀올게, 다음엔 같이 보내자.' },
-          { type: 'criticism', text: '그런 식으로 말하면 나가기도 눈치 보이게 만들잖아.' },
-          { type: 'avoidance', text: '(말없이 다시 가방을 내려놓는다)' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '그런 뜻 아니야... 미안, 말이 심했다.' },
-          { type: 'criticism', text: '그렇게까지 말할 일이야?' },
-          { type: 'avoidance', text: '(가방을 내려놓고 자리에 앉는다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...정말 가도 괜찮아? 마음에 걸리는데.' },
-          { type: 'criticism', text: '가라고 하면서 그런 표정 짓지 마.' },
-          { type: 'avoidance', text: '...그럼, 다녀올게.' },
-        ],
-      },
-      avoidance: {
-        empathy: [
-          { type: 'empathy',   text: '아니야, 같이 있을게. 친구들한테는 다음에 보자고 할게.' },
-          { type: 'criticism', text: '내가 뭘 그렇게 잘못했다고 그래...' },
-          { type: 'avoidance', text: '...그럼 다녀올게.' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '그렇게 말하지 마... 오늘은 그냥 집에 있을게.' },
-          { type: 'criticism', text: '됐다고 하면서 신경 쓰이게 만들잖아.' },
-          { type: 'avoidance', text: '(가방을 든 채 망설인다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...진짜 가도 돼? 마음 불편하면 말해줘.' },
-          { type: 'criticism', text: '됐다는 게 진짜 됐다는 거야?' },
-          { type: 'avoidance', text: '...그래, 다녀올게.' },
-        ],
-      },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '응, 재밌는 거 있으면 얘기해줄게. 금방 다녀올게.' },
+        { type: 'avoidance', slot: 'b', text: '응, 다녀올게.' },
+        { type: 'empathy',   slot: 'c', text: '고마워.' },
+        { type: 'avoidance', slot: 'd', text: '어.' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '그랬구나, 미안. 다음엔 같이 있자.' },
+        { type: 'empathy',   slot: 'b', text: '미안.' },
+        { type: 'empathy',   slot: 'c', text: '나도 같이 있고 싶은데.' },
+        { type: 'criticism', slot: 'd', text: '친구도 만나야 하잖아.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '그랬구나, 미안. 다음엔 같이 있자.' },
+        { type: 'empathy',   slot: 'b', text: '미안.' },
+        { type: 'empathy',   slot: 'c', text: '나도 같이 있고 싶은데.' },
+        { type: 'criticism', slot: 'd', text: '친구도 만나야 하잖아.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '혼자 살자는 말 하지 마. 나 그 말 싫어.' },
+        { type: 'criticism', slot: 'b', text: '왜 그렇게 말해.' },
+        { type: 'empathy',   slot: 'c', text: '그런 말 상처돼.' },
+        { type: 'avoidance', slot: 'd', text: '그래, 알아서 해.' },
+      ],
+    },
+    A3: {
+      a: [
+        { type: 'empathy',   slot: 'a', text: '응, 조심히 다녀와. 들어오면 얘기하자.' },
+        { type: 'empathy',   slot: 'b', text: '응, 기다릴게.' },
+        { type: 'avoidance', slot: 'c', text: '알겠어.' },
+        { type: 'criticism', slot: 'd', text: '빨리 와.' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '아니야, 다녀와. 다음엔 같이 나가자.' },
+        { type: 'avoidance', slot: 'b', text: '응, 다녀와.' },
+        { type: 'avoidance', slot: 'c', text: '알겠어.' },
+        { type: 'criticism', slot: 'd', text: '맨날 미안이야.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '아니야, 다녀와. 다음엔 같이 나가자.' },
+        { type: 'avoidance', slot: 'b', text: '응, 다녀와.' },
+        { type: 'avoidance', slot: 'c', text: '알겠어.' },
+        { type: 'criticism', slot: 'd', text: '맨날 미안이야.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '그런 말 한 건 미안해. 그냥 같이 있고 싶었어.' },
+        { type: 'avoidance', slot: 'b', text: '…됐어.' },
+        { type: 'empathy',   slot: 'c', text: '미안.' },
+        { type: 'avoidance', slot: 'd', text: '됐어.' },
+      ],
+    },
+    B3: {
+      a: [
+        { type: 'empathy',   text: '응, 들어와서 오늘 얘기 해줄게. 기다려줘서 고마워.' },
+        { type: 'avoidance', text: '어, 알겠어.' },
+        { type: 'empathy',   text: '미안해, 다음엔 같이 있자.' },
+        { type: 'avoidance', text: '어.' },
+      ],
+      b: [
+        { type: 'empathy',   text: '응, 다음엔 같이 나가자.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '미안.' },
+        { type: 'avoidance', text: '알아서 해.' },
+      ],
+      c: [
+        { type: 'empathy',   text: '응, 다음엔 같이 나가자.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '미안.' },
+        { type: 'avoidance', text: '알아서 해.' },
+      ],
+      d: [
+        { type: 'empathy',   text: '그 말 듣기 싫어. 같이 있고 싶어서 그런 거 알아.' },
+        { type: 'empathy',   text: '…미안.' },
+        { type: 'empathy',   text: '나도 미안해.' },
+        { type: 'avoidance', text: '그래.' },
+      ],
     },
   },
 
@@ -804,16 +848,16 @@ const SCENARIO_POOL = [
     },
     B2: {
       a: [
-        { type: 'empathy',   slot: 'a', text: '맞아, 같이 정하자. 나 뭐 하면 좋을까?' },
-        { type: 'avoidance', slot: 'b', text: '응, 그러자.' },
-        { type: 'empathy',   slot: 'c', text: '미안, 내가 더 신경 쓸게.' },
-        { type: 'avoidance', slot: 'd', text: '꼭 정해야 해?' },
-      ],
-      b: [
         { type: 'empathy',   slot: 'a', text: '미안, 그냥 지나쳤네. 수고했어, 진심으로.' },
         { type: 'empathy',   slot: 'b', text: '…수고했어.' },
         { type: 'empathy',   slot: 'c', text: '몰랐어, 미안.' },
         { type: 'criticism', slot: 'd', text: '그런 게 필요해?' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '맞아, 같이 정하자. 나 뭐 하면 좋을까?' },
+        { type: 'avoidance', slot: 'b', text: '응, 그러자.' },
+        { type: 'empathy',   slot: 'c', text: '미안, 내가 더 신경 쓸게.' },
+        { type: 'avoidance', slot: 'd', text: '꼭 정해야 해?' },
       ],
       c: [
         { type: 'empathy',   slot: 'a', text: '그러자. 뭐부터 정할까?' },
@@ -1041,96 +1085,140 @@ const SCENARIO_POOL = [
     bg: 'bg_living.png',
     situation: n => `오늘은 중요한 발표가 있는 날이었는데, ${n.B}가 "잘됐어?"라는 말 한마디 없이 지나갔어요. 이런 일이 처음이 아니에요.`,
     A1: [
-      { type: 'empathy',   text: '오늘 발표 있었는데 기억하고 있었어?' },
-      { type: 'criticism', text: '역시 넌 내 일에 관심 없구나.' },
-      { type: 'avoidance', text: '...(아무 말 안 한다)' },
+      { type: 'empathy',   slot: 'a', text: '오늘 발표 있었는데 기억하고 있었어?' },
+      { type: 'avoidance', slot: 'b', text: '오늘 좀 힘든 날이었어.' },
+      { type: 'avoidance', slot: 'c', text: '(아무 말 안 한다)' },
+      { type: 'criticism', slot: 'd', text: '역시 넌 내 일에 관심 없구나.' },
     ],
     B1: {
-      empathy: [
-        { type: 'empathy',   text: '아, 맞다. 어떻게 됐어? 미안, 내가 물어봤어야 했는데.' },
-        { type: 'criticism', text: '내가 다 기억할 수는 없잖아.' },
-        { type: 'avoidance', text: '응? 발표 있었어? 어떻게 됐어?' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '아, 맞다. 어떻게 됐어? 미안, 물어봤어야 했는데.' },
+        { type: 'avoidance', slot: 'b', text: '발표 있었어? 어떻게 됐어? (뒤늦게)' },
+        { type: 'empathy',   slot: 'c', text: '미안, 깜빡했어.' },
+        { type: 'criticism', slot: 'd', text: '내가 다 기억할 수는 없잖아.' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '맞아, 내가 더 신경 썼어야 했어. 나한테 화난 거야?' },
-        { type: 'criticism', text: '내가 항상 신경 안 쓴다고 생각하지 마.' },
-        { type: 'avoidance', text: '그런 거 아니야… 그냥 바빴어.' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '많이 힘들어 보여. 무슨 일 있었어?' },
+        { type: 'criticism', slot: 'b', text: '나도 힘들었어.' },
+        { type: 'avoidance', slot: 'c', text: '왜?' },
+        { type: 'criticism', slot: 'd', text: '왜? 무슨 일이야. (귀찮은 듯)' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '오늘 많이 힘들어 보여. 무슨 일 있었어?' },
-        { type: 'criticism', text: '왜, 무슨 일인데. (귀찮은 듯)' },
-        { type: 'avoidance', text: '...(눈치 못 채고 각자 핸드폰을 본다)' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '오늘 좀 안 좋아 보여. 괜찮아?' },
+        { type: 'avoidance', slot: 'b', text: '(눈치 못 채고 각자 핸드폰)' },
+        { type: 'avoidance', slot: 'c', text: '왜 그래.' },
+        { type: 'criticism', slot: 'd', text: '왜 그래. (짧게)' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '맞아, 내가 더 신경 썼어야 했어. 나한테 화난 거야?' },
+        { type: 'avoidance', slot: 'b', text: '그런 거 아니야… 바빴어.' },
+        { type: 'criticism', slot: 'c', text: '그런 말은 좀.' },
+        { type: 'criticism', slot: 'd', text: '내가 항상 그렇다고 생각하지 마.' },
       ],
     },
     A2: {
-      empathy: [
-        { type: 'empathy',   text: '응, 잘 끝났어. 물어봐줘서 고마워.' },
-        { type: 'criticism', text: '근데 매번 이렇게 잊어버리니까 서운해.' },
-        { type: 'avoidance', text: '...그냥 그랬어.' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '고마워. 사실 기다렸어. 이번 한 번만이 아니라서.' },
+        { type: 'avoidance', slot: 'b', text: '잘 끝났어.' },
+        { type: 'criticism', slot: 'c', text: '다음엔 기억해줘.' },
+        { type: 'criticism', slot: 'd', text: '맨날 뒤늦게야.' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '그래, 다 기억하기 힘들지. 그래도 오늘은 좀 중요한 날이었어서.' },
-        { type: 'criticism', text: '기억 못 할 수도 있지만, 그게 매번이라 문제야.' },
-        { type: 'avoidance', text: '...됐어, 별거 아니야.' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '그랬구나. 너도 힘들었어? 같이 얘기하자.' },
+        { type: 'avoidance', slot: 'b', text: '…그래.' },
+        { type: 'criticism', slot: 'c', text: '나도 힘들었는데.' },
+        { type: 'criticism', slot: 'd', text: '내 얘기 들을 생각은 없어?' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '응... 사실 오늘 발표가 있었는데, 아무 말도 없어서 좀 서운했어.' },
-        { type: 'criticism', text: '귀찮아하지 말고 좀 물어봐주면 안 돼?' },
-        { type: 'avoidance', text: '...아니, 아무것도 아니야.' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '나 오늘 힘든 날이었어. 얘기해도 돼?' },
+        { type: 'avoidance', slot: 'b', text: '…됐어.' },
+        { type: 'criticism', slot: 'c', text: '발표 있었는데.' },
+        { type: 'criticism', slot: 'd', text: '진짜 관심 없구나.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '항상이 아니라 오늘 하나만 얘기하는 거야.' },
+        { type: 'avoidance', slot: 'b', text: '…알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '항상은 아니지만 오늘은 서운했어.' },
+        { type: 'criticism', slot: 'd', text: '그게 변명이야?' },
       ],
     },
     B2: {
-      empathy: {
-        empathy: [
-          { type: 'empathy',   text: '그래... 다음엔 미리 챙겨볼게. 미안해.' },
-          { type: 'criticism', text: '알겠어, 알겠어. 그렇게까지 말 안 해도 돼.' },
-          { type: 'avoidance', text: '...응.' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '맞아... 매번 그랬던 건 진짜 미안해. 앞으로 달력에 적어둘게.' },
-          { type: 'criticism', text: '매번이라니, 그렇게 자주는 아니었던 것 같은데.' },
-          { type: 'avoidance', text: '(말없이 고개를 숙인다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...괜찮았어? 표정 보니 별로였나봐. 얘기해줘.' },
-          { type: 'criticism', text: '그냥 그랬다면서 표정은 안 그런데.' },
-          { type: 'avoidance', text: '...그래.' },
-        ],
-      },
-      criticism: {
-        empathy: [
-          { type: 'empathy',   text: '그래, 미안해. 더 신경 쓸게.' },
-          { type: 'criticism', text: '항상 신경 안 쓴다고 한 적 없는데, 너무 몰아붙이네.' },
-          { type: 'avoidance', text: '(말없이 핸드폰을 내려놓는다)' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '그래... 매번이라는 말이 맞는 것 같아. 고치도록 노력할게.' },
-          { type: 'criticism', text: '매번이라고 단정 짓는 것도 좀 그렇잖아.' },
-          { type: 'avoidance', text: '(자리에서 일어나 방으로 들어간다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...아니야, 별거 아니라고 하지 마. 미안해, 진심으로.' },
-          { type: 'criticism', text: '별거 아니라면서 그 표정은 뭐야.' },
-          { type: 'avoidance', text: '...그래.' },
-        ],
-      },
-      avoidance: {
-        empathy: [
-          { type: 'empathy',   text: '그랬구나... 미리 말 못 해서 미안해. 어떻게 됐어?' },
-          { type: 'criticism', text: '말 안 한 건 미안한데, 서운하다고 하니까 좀 그렇네.' },
-          { type: 'avoidance', text: '(말없이 자리를 피한다)' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '미안해... 귀찮아서가 아니라 진짜 못 봤어. 어떻게 됐어?' },
-          { type: 'criticism', text: '별거 아니라면서 왜 그렇게 말해.' },
-          { type: 'avoidance', text: '(말없이 시선을 피한다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...진짜 아무것도 아니야? 표정이 안 좋아 보여서.' },
-          { type: 'criticism', text: '아무것도 아니라면서 그 말투는 뭐야.' },
-          { type: 'avoidance', text: '...그래.' },
-        ],
-      },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '그랬구나. 오래됐어? 나한테 말 못 한 게 많아?' },
+        { type: 'empathy',   slot: 'b', text: '미안, 몰랐어.' },
+        { type: 'empathy',   slot: 'c', text: '그래? 뭔데.' },
+        { type: 'criticism', slot: 'd', text: '맨날 서운하다고 하면 나도 힘들어.' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '그렇구나. 오늘 뭔 일 있었어?' },
+        { type: 'empathy',   slot: 'b', text: '응, 같이 얘기하자.' },
+        { type: 'empathy',   slot: 'c', text: '미안, 내 얘기만 했네.' },
+        { type: 'criticism', slot: 'd', text: '나도 힘들었어.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '그렇구나. 오늘 뭔 일 있었어?' },
+        { type: 'empathy',   slot: 'b', text: '응, 같이 얘기하자.' },
+        { type: 'empathy',   slot: 'c', text: '미안, 내 얘기만 했네.' },
+        { type: 'criticism', slot: 'd', text: '나도 힘들었어.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '관심 없는 거 아니야. 내가 너무 무심했어.' },
+        { type: 'criticism', slot: 'b', text: '그런 말 하지 마.' },
+        { type: 'empathy',   slot: 'c', text: '미안.' },
+        { type: 'criticism', slot: 'd', text: '관심 없다고 하지 마.' },
+      ],
+    },
+    A3: {
+      a: [
+        { type: 'empathy',   slot: 'a', text: '응, 쌓인 게 있어. 하나씩 얘기할 수 있어?' },
+        { type: 'empathy',   slot: 'b', text: '응, 얘기해보자.' },
+        { type: 'empathy',   slot: 'c', text: '오늘은 발표 얘기만 할게.' },
+        { type: 'criticism', slot: 'd', text: '말해봤자 뭐가 달라져.' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '고마워. 들어줘서.' },
+        { type: 'avoidance', slot: 'b', text: '응.' },
+        { type: 'criticism', slot: 'c', text: '다음엔 기억해줘.' },
+        { type: 'criticism', slot: 'd', text: '맨날 몰랐다고 하면 어떡해.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '고마워. 들어줘서.' },
+        { type: 'avoidance', slot: 'b', text: '응.' },
+        { type: 'criticism', slot: 'c', text: '다음엔 기억해줘.' },
+        { type: 'criticism', slot: 'd', text: '맨날 몰랐다고 하면 어떡해.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '힘들게 하려는 게 아니야. 그냥 알아줬으면 했어.' },
+        { type: 'avoidance', slot: 'b', text: '…알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '미안.' },
+        { type: 'avoidance', slot: 'd', text: '그래, 앞으로 말 안 할게.' },
+      ],
+    },
+    B3: {
+      a: [
+        { type: 'empathy',   text: '응, 하나씩 얘기하자. 나 들을게.' },
+        { type: 'empathy',   text: '어, 그러자.' },
+        { type: 'empathy',   text: '미안했어, 진심으로.' },
+        { type: 'avoidance', text: '어.' },
+      ],
+      b: [
+        { type: 'empathy',   text: '응, 다음엔 꼭 기억할게.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '미안.' },
+        { type: 'avoidance', text: '알겠어.' },
+      ],
+      c: [
+        { type: 'empathy',   text: '응, 다음엔 꼭 기억할게.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '미안.' },
+        { type: 'avoidance', text: '알겠어.' },
+      ],
+      d: [
+        { type: 'empathy',   text: '그런 말 하지 마. 나 네 얘기 듣고 싶어.' },
+        { type: 'empathy',   text: '…미안.' },
+        { type: 'empathy',   text: '그러지 마.' },
+        { type: 'avoidance', text: '그래.' },
+      ],
     },
   },
 
@@ -1144,96 +1232,140 @@ const SCENARIO_POOL = [
     bg: 'bg_bedroom.png',
     situation: n => `이번 달 카드값이 예상보다 많이 나왔어요. ${n.B}가 쓴 것 같은데, ${n.A}가 먼저 물어보려고 해요.`,
     A1: [
-      { type: 'empathy',   text: '이번 달 카드값 얘기 좀 할 수 있어? 같이 확인하고 싶어서.' },
-      { type: 'criticism', text: '이게 다 뭐야. 왜 이렇게 썼어.' },
-      { type: 'avoidance', text: '요즘 돈 관리 어떻게 하고 있어?' },
+      { type: 'empathy',   slot: 'a', text: '이번 달 카드값 같이 한번 볼 수 있어? 좀 많이 나온 것 같아서.' },
+      { type: 'criticism', slot: 'b', text: '이번 달 좀 많이 쓴 것 같아.' },
+      { type: 'avoidance', slot: 'c', text: '요즘 돈 관리 어떻게 하고 있어?' },
+      { type: 'criticism', slot: 'd', text: '이게 다 뭐야. 왜 이렇게 썼어.' },
     ],
     B1: {
-      empathy: [
-        { type: 'empathy',   text: '응, 나 이번에 좀 썼어. 같이 보자.' },
-        { type: 'criticism', text: '왜? 내 돈 내가 쓰는 게 문제야?' },
-        { type: 'avoidance', text: '어… 내가 좀 썼나? 뭔가 있었거든.' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '응, 나 이번에 좀 썼어. 같이 보자.' },
+        { type: 'avoidance', slot: 'b', text: '내가 좀 썼나? 뭔가 있었거든.' },
+        { type: 'avoidance', slot: 'c', text: '많이 나왔어?' },
+        { type: 'criticism', slot: 'd', text: '내 돈 내가 쓰는 게 문제야?' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '미안해. 말했어야 했는데. 사실 요즘 좀 스트레스 받아서…' },
-        { type: 'criticism', text: '내 씀씀이가 문제야? 당신은 안 써?' },
-        { type: 'avoidance', text: '필요해서 쓴 건데, 그렇게 말하면 서운하다.' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '응, 내가 좀 썼어. 말했어야 했는데.' },
+        { type: 'criticism', slot: 'b', text: '나? 필요한 거 샀는데.' },
+        { type: 'avoidance', slot: 'c', text: '얼마나 나왔는데?' },
+        { type: 'criticism', slot: 'd', text: '맨날 돈 얘기야.' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '응, 내가 좀 썼어. 말했어야 했는데.' },
-        { type: 'criticism', text: '맨날 돈 얘기야.' },
-        { type: 'avoidance', text: '나? 필요한 거 샀는데.' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '나 요즘 좀 많이 쓴 것 같아. 같이 정리해보자.' },
+        { type: 'criticism', slot: 'b', text: '왜? 뭐가 문제야.' },
+        { type: 'avoidance', slot: 'c', text: '그냥 쓰는 거지.' },
+        { type: 'avoidance', slot: 'd', text: '내가 알아서 해.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '미안해. 말했어야 했는데. 요즘 스트레스 받아서…' },
+        { type: 'criticism', slot: 'b', text: '필요해서 쓴 건데.' },
+        { type: 'criticism', slot: 'c', text: '그렇게 말하면 서운하다.' },
+        { type: 'criticism', slot: 'd', text: '당신은 안 써?' },
       ],
     },
     A2: {
-      empathy: [
-        { type: 'empathy',   text: '그래, 같이 보면서 정리해보자. 무슨 일 있었던 거야?' },
-        { type: 'criticism', text: '문제는 아닌데, 미리 말해줬으면 좋았겠어.' },
-        { type: 'avoidance', text: '...그래.' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '그래, 같이 보면서 정리해보자. 무슨 일 있었던 거야?' },
+        { type: 'avoidance', slot: 'b', text: '응, 같이 보자.' },
+        { type: 'criticism', slot: 'c', text: '왜 많이 쓴 거야? 무슨 일 있었어?' },
+        { type: 'criticism', slot: 'd', text: '미리 말해줬으면 좋았을 텐데.' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '그래, 필요했으면 그럴 수 있지. 다음엔 같이 상의하자.' },
-        { type: 'criticism', text: '돈 얘기가 아니라, 같이 계획하자는 거야.' },
-        { type: 'avoidance', text: '...됐어, 알아서 해.' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '필요한 거 맞는데, 같이 얘기하고 싶었어.' },
+        { type: 'avoidance', slot: 'b', text: '그래, 알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '뭘 샀어?' },
+        { type: 'criticism', slot: 'd', text: '필요한 거면 미리 말하지.' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '그래... 무슨 일 있었던 거야? 같이 얘기해보자.' },
-        { type: 'criticism', text: '당신만 쓰는 게 아니지만, 이번엔 좀 크잖아.' },
-        { type: 'avoidance', text: '...그래, 알겠어.' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '스트레스 받았구나. 뭔 일이야?' },
+        { type: 'criticism', slot: 'b', text: '그래도 미리 말해줬으면 했어.' },
+        { type: 'empathy',   slot: 'c', text: '많이 힘들었어?' },
+        { type: 'criticism', slot: 'd', text: '스트레스가 이유가 돼?' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '따지는 게 아니야. 같이 관리하고 싶어서.' },
+        { type: 'avoidance', slot: 'b', text: '...알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '나도 써. 같이 얘기하자는 거야.' },
+        { type: 'criticism', slot: 'd', text: '그게 대답이야?' },
       ],
     },
     B2: {
-      empathy: {
-        empathy: [
-          { type: 'empathy',   text: '고마워... 사실 요즘 일 때문에 많이 불안했어. 같이 얘기하면서 풀고 싶어.' },
-          { type: 'criticism', text: '노력은 하는데 매번 이렇게 따지면 더 위축돼.' },
-          { type: 'avoidance', text: '...생각해볼게.' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '맞아, 미리 말했어야 했는데... 다음엔 꼭 얘기할게.' },
-          { type: 'criticism', text: '말한다고 뭐가 달라져? 어차피 또 이런 얘기 나올 텐데.' },
-          { type: 'avoidance', text: '(말없이 영수증을 정리한다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...진짜 괜찮아? 같이 얘기하고 싶어서 그래.' },
-          { type: 'criticism', text: '그래라고만 하면 또 똑같은 거잖아.' },
-          { type: 'avoidance', text: '...응.' },
-        ],
-      },
-      criticism: {
-        empathy: [
-          { type: 'empathy',   text: '미안해... 네 말이 맞아, 더 솔직하게 얘기했어야 했어.' },
-          { type: 'criticism', text: '그래, 내가 문제다 이거지. 알았어.' },
-          { type: 'avoidance', text: '(대화를 끝내고 나가버린다)' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '그래... 계획 세우는 거 좋아. 다음부턴 같이 정하자.' },
-          { type: 'criticism', text: '계획 세운다는 게 결국 내 카드 막으라는 소리잖아.' },
-          { type: 'avoidance', text: '(자리에서 일어나 방으로 들어간다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...아니야, 알아서 하라고 하지 마. 같이 얘기하자, 미안해.' },
-          { type: 'criticism', text: '알아서 하라면서 또 그 표정이네.' },
-          { type: 'avoidance', text: '...그래.' },
-        ],
-      },
-      avoidance: {
-        empathy: [
-          { type: 'empathy',   text: '그래... 우리 둘 다 너무 예민해진 것 같아. 같이 정리해보자.' },
-          { type: 'criticism', text: '이렇게 끝낼 거면 말을 왜 꺼냈어?' },
-          { type: 'avoidance', text: '...그래, 그러자.' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '그래, 맞아... 이번엔 좀 과했어. 같이 줄여보자.' },
-          { type: 'criticism', text: '크다고 따지는 거 보니 결국 또 나 탓이네.' },
-          { type: 'avoidance', text: '(말없이 카드 내역을 다시 본다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...그렇게 끝내지 말고, 진짜 얘기 좀 해보자.' },
-          { type: 'criticism', text: '알겠다면서 표정은 안 그런데.' },
-          { type: 'avoidance', text: '...그래.' },
-        ],
-      },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '응, 같이 보자. 사실 요즘 좀 힘들었어.' },
+        { type: 'avoidance', slot: 'b', text: '어, 같이 보자.' },
+        { type: 'empathy',   slot: 'c', text: '미안, 말했어야 했는데.' },
+        { type: 'avoidance', slot: 'd', text: '꼭 같이 봐야 해?' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '요즘 좀 힘든 일이 있었어. 말 못 했네.' },
+        { type: 'avoidance', slot: 'b', text: '그냥 좀 그랬어.' },
+        { type: 'avoidance', slot: 'c', text: '별거 아니야.' },
+        { type: 'criticism', slot: 'd', text: '왜 꼭 말해야 해.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '요즘 좀 힘든 일이 있었어. 말 못 했네.' },
+        { type: 'avoidance', slot: 'b', text: '그냥 좀 그랬어.' },
+        { type: 'avoidance', slot: 'c', text: '별거 아니야.' },
+        { type: 'criticism', slot: 'd', text: '왜 꼭 말해야 해.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '맞아, 미리 말했어야 했어. 미안.' },
+        { type: 'avoidance', slot: 'b', text: '...그럴게.' },
+        { type: 'empathy',   slot: 'c', text: '나도 미안해.' },
+        { type: 'criticism', slot: 'd', text: '맨날 뭐라 해.' },
+      ],
+    },
+    A3: {
+      a: [
+        { type: 'empathy',   slot: 'a', text: '힘든 일 있었구나. 같이 보면서 얘기도 하자.' },
+        { type: 'avoidance', slot: 'b', text: '응, 같이 보자.' },
+        { type: 'empathy',   slot: 'c', text: '무슨 일이었어?' },
+        { type: 'criticism', slot: 'd', text: '그러면 미리 말해줬으면 됐잖아.' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '알겠어. 앞으로 미리 얘기하자.' },
+        { type: 'avoidance', slot: 'b', text: '응.' },
+        { type: 'empathy',   slot: 'c', text: '같이 관리하자.' },
+        { type: 'criticism', slot: 'd', text: '맨날 이러면 나도 힘들어.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '알겠어. 앞으로 미리 얘기하자.' },
+        { type: 'avoidance', slot: 'b', text: '응.' },
+        { type: 'empathy',   slot: 'c', text: '같이 관리하자.' },
+        { type: 'criticism', slot: 'd', text: '맨날 이러면 나도 힘들어.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '뭐라 하는 게 아니야. 같이 하고 싶어서.' },
+        { type: 'avoidance', slot: 'b', text: '...알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '그냥 같이 보자.' },
+        { type: 'avoidance', slot: 'd', text: '그래, 앞으로 신경 안 쓸게.' },
+      ],
+    },
+    B3: {
+      a: [
+        { type: 'empathy',   text: '응, 같이 보자. 앞으로 미리 얘기할게.' },
+        { type: 'empathy',   text: '어, 그러자.' },
+        { type: 'empathy',   text: '미안했어.' },
+        { type: 'avoidance', text: '어.' },
+      ],
+      b: [
+        { type: 'empathy',   text: '응, 같이 관리하자.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '미안.' },
+        { type: 'avoidance', text: '알겠어.' },
+      ],
+      c: [
+        { type: 'empathy',   text: '응, 같이 관리하자.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '미안.' },
+        { type: 'avoidance', text: '알겠어.' },
+      ],
+      d: [
+        { type: 'empathy',   text: '신경 꺼달라는 게 아니야. 같이 하고 싶어.' },
+        { type: 'empathy',   text: '...미안.' },
+        { type: 'empathy',   text: '나도 미안해.' },
+        { type: 'avoidance', text: '그래.' },
+      ],
     },
   },
 
@@ -1249,96 +1381,140 @@ const SCENARIO_POOL = [
     bg: 'bg_bedroom.png',
     situation: n => `${n.A}가 별 뜻 없이 던진 말 한마디에 ${n.B}가 갑자기 평소와 다르게 화를 냈어요. 작은 일인데 반응이 너무 커서 ${n.A}는 당황스러워요.`,
     A1: [
-      { type: 'empathy',   text: '갑자기 많이 화났구나. 나 뭔가 잘못한 게 있어?' },
-      { type: 'criticism', text: '그 작은 걸로 왜 이렇게 과민반응이야.' },
-      { type: 'avoidance', text: '...(아무 말 안 한다 — 침묵)' },
+      { type: 'empathy',   slot: 'a', text: '갑자기 많이 화났구나. 내가 뭔가 잘못한 게 있어?' },
+      { type: 'criticism', slot: 'b', text: '왜 갑자기 화내는 거야.' },
+      { type: 'avoidance', slot: 'c', text: '...(아무 말 없이 기다린다)' },
+      { type: 'criticism', slot: 'd', text: '그 작은 걸로 왜 이렇게 과민반응이야.' },
     ],
     B1: {
-      empathy: [
-        { type: 'empathy',   text: '...아니, 너 때문이 아니라. 그냥 요즘 쌓인 게 많았나 봐.' },
-        { type: 'criticism', text: '몰라, 그냥 다 짜증나.' },
-        { type: 'avoidance', text: '...아무것도 아니야. 신경 쓰지 마.' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '미안, 이것만이 아니야. 오랫동안 말 못 했던 게 있어.' },
+        { type: 'avoidance', slot: 'b', text: '아니, 그냥 오늘 좀 힘들었어.' },
+        { type: 'avoidance', slot: 'c', text: '잠깐만.' },
+        { type: 'criticism', slot: 'd', text: '지금 사과하면 다 해결되는 줄 알아?' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '...미안. 나도 왜 이렇게 화났는지 모르겠어.' },
-        { type: 'criticism', text: '과민반응이라고? 진짜 그렇게 생각해?' },
-        { type: 'avoidance', text: '...됐어. (방에 들어간다)' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '갑자기가 아니야. 오래됐어.' },
+        { type: 'avoidance', slot: 'b', text: '그냥 오늘 예민했어.' },
+        { type: 'avoidance', slot: 'c', text: '말하기 싫어.' },
+        { type: 'criticism', slot: 'd', text: '갑자기가 아니거든.' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '...(눈물이 글썽인 채로) 사실 요즘 너무 힘들었어.' },
-        { type: 'criticism', text: '왜 아무 말도 안 해. 그게 더 화나.' },
-        { type: 'avoidance', text: '...됐어. (방에 들어간다)' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '...사실 많이 쌓였어. 그냥 넘어갔는데 오늘은 못 넘어가겠어.' },
+        { type: 'avoidance', slot: 'b', text: '...됐어. (방으로 들어감)' },
+        { type: 'avoidance', slot: 'c', text: '...말하기 싫어.' },
+        { type: 'criticism', slot: 'd', text: '뭘 그렇게 쳐다봐.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '과민반응처럼 보였겠지만, 나 진짜 많이 참았어.' },
+        { type: 'avoidance', slot: 'b', text: '그냥 오늘 힘들었어.' },
+        { type: 'criticism', slot: 'c', text: '과민반응 아니야.' },
+        { type: 'criticism', slot: 'd', text: '맞아, 나 원래 이렇게 예민해. 그게 문제야?' },
       ],
     },
     A2: {
-      empathy: [
-        { type: 'empathy',   text: '요즘 많이 힘들었나 보다. 무슨 일 있었는지 얘기해줄 수 있어?' },
-        { type: 'criticism', text: '쌓인 게 있으면 진작 말했어야지.' },
-        { type: 'avoidance', text: '...그래, 알겠어.' },
+      a: [
+        { type: 'empathy',   slot: 'a', text: '말해줘서 고마워. 그동안 많이 힘들었겠다.' },
+        { type: 'empathy',   slot: 'b', text: '그래? 뭔데. 말해봐.' },
+        { type: 'criticism', slot: 'c', text: '몰랐어. 왜 말 안 했어?' },
+        { type: 'criticism', slot: 'd', text: '그럼 진작 말하지.' },
       ],
-      criticism: [
-        { type: 'empathy',   text: '미안해, 그렇게 말할 게 아니었어. 무슨 일인지 얘기해줄래?' },
-        { type: 'criticism', text: '짜증난다고만 하면 나도 어떻게 해야 할지 모르겠어.' },
-        { type: 'avoidance', text: '...알겠어, 그냥 좀 있다 얘기하자.' },
+      b: [
+        { type: 'empathy',   slot: 'a', text: '지금 말하기 어려우면 나중에 얘기하자. 기다릴게.' },
+        { type: 'avoidance', slot: 'b', text: '(그냥 둔다)' },
+        { type: 'empathy',   slot: 'c', text: '잠깐, 가지 마.' },
+        { type: 'criticism', slot: 'd', text: '그렇게 피하면 아무것도 안 해결돼.' },
       ],
-      avoidance: [
-        { type: 'empathy',   text: '잠깐, 가지 마. 무슨 일인지 같이 얘기해보고 싶어.' },
-        { type: 'criticism', text: '말을 해야 알지. 그냥 들어가면 어떡해.' },
-        { type: 'avoidance', text: '...그래, 좀 혼자 있게 해줄게.' },
+      c: [
+        { type: 'empathy',   slot: 'a', text: '강요 안 할게. 준비되면 말해줘.' },
+        { type: 'avoidance', slot: 'b', text: '그래, 알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '언제든 말해줘.' },
+        { type: 'criticism', slot: 'd', text: '말을 해야 알지.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '예민한 게 나쁜 게 아니야. 그냥 네가 어떤지 알고 싶어.' },
+        { type: 'avoidance', slot: 'b', text: '...그래.' },
+        { type: 'criticism', slot: 'c', text: '그런 말 하지 마.' },
+        { type: 'criticism', slot: 'd', text: '그게 변명이야?' },
       ],
     },
     B2: {
-      empathy: {
-        empathy: [
-          { type: 'empathy',   text: '...고마워. 사실 요즘 일도 그렇고 여러 가지로 너무 지쳐 있었어.' },
-          { type: 'criticism', text: '말하고 싶었는데... 그렇게 쉽게 말이 안 나오더라.' },
-          { type: 'avoidance', text: '...조금만 시간 줄래?' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '맞아... 진작 말했어야 했는데, 그게 어렵더라. 미안해.' },
-          { type: 'criticism', text: '말한다고 뭐가 달라지나 싶어서 그랬어.' },
-          { type: 'avoidance', text: '(말없이 시선을 떨군다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...괜찮아? 더 듣고 싶으면 얘기해줄게.' },
-          { type: 'criticism', text: '알겠다고만 하니까 더 미안하네.' },
-          { type: 'avoidance', text: '...응.' },
-        ],
-      },
-      criticism: {
-        empathy: [
-          { type: 'empathy',   text: '...나도 미안해. 요즘 너무 예민했던 것 같아.' },
-          { type: 'criticism', text: '나도 모르겠어. 그냥 다 버겁다는 느낌이야.' },
-          { type: 'avoidance', text: '(문을 닫고 들어간다)' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '그래... 나도 잘 모르겠어서 그랬나 봐. 같이 생각해보자.' },
-          { type: 'criticism', text: '나도 어떻게 해야 할지 모르겠는 건 마찬가지야.' },
-          { type: 'avoidance', text: '(말없이 자리에서 일어난다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...그래, 고마워. 좀 진정되면 얘기할게.' },
-          { type: 'criticism', text: '있다 얘기하자면서 또 피하는 거 아니야?' },
-          { type: 'avoidance', text: '...그래.' },
-        ],
-      },
-      avoidance: {
-        empathy: [
-          { type: 'empathy',   text: '...(돌아서서) 고마워. 사실 혼자 있고 싶진 않았어.' },
-          { type: 'criticism', text: '그냥 좀 혼자 있고 싶어서 그래.' },
-          { type: 'avoidance', text: '(방문을 닫는다)' },
-        ],
-        criticism: [
-          { type: 'empathy',   text: '...미안, 너 말이 맞아. 잠깐만 시간 주면 얘기할게.' },
-          { type: 'criticism', text: '말 안 한다고 다그치면 더 말하기 싫어져.' },
-          { type: 'avoidance', text: '(방문을 닫는다)' },
-        ],
-        avoidance: [
-          { type: 'empathy',   text: '...고마워. 정리되면 얘기할게.' },
-          { type: 'criticism', text: '혼자 있게 해준다면서 그게 또 서운하네.' },
-          { type: 'avoidance', text: '(방문을 닫는다)' },
-        ],
-      },
+      a: [
+        { type: 'empathy', slot: 'a', text: '사실 나 요즘 많이 힘들었어. 너한테 말하기 어려웠어.' },
+        { type: 'empathy', slot: 'b', text: '미안, 좀 진정하고 얘기하자.' },
+        { type: 'empathy', slot: 'c', text: '고마워.' },
+        { type: 'avoidance', slot: 'd', text: '됐어.' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '...고마워. 잠깐만 있다가 나올게.' },
+        { type: 'avoidance', slot: 'b', text: '...됐어.' },
+        { type: 'empathy',   slot: 'c', text: '미안.' },
+        { type: 'avoidance', slot: 'd', text: '혼자 있고 싶어.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '...고마워. 잠깐만 있다가 나올게.' },
+        { type: 'avoidance', slot: 'b', text: '...됐어.' },
+        { type: 'empathy',   slot: 'c', text: '미안.' },
+        { type: 'avoidance', slot: 'd', text: '혼자 있고 싶어.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '피하는 게 아니라 지금 말하면 더 크게 싸울 것 같아서.' },
+        { type: 'empathy',   slot: 'b', text: '미안.' },
+        { type: 'avoidance', slot: 'c', text: '나중에 얘기하자.' },
+        { type: 'avoidance', slot: 'd', text: '그래, 안 해결되면 어때.' },
+      ],
+    },
+    A3: {
+      a: [
+        { type: 'empathy',   slot: 'a', text: '그랬구나. 말하기 어려웠겠다. 하나씩 얘기해줘.' },
+        { type: 'empathy',   slot: 'b', text: '응, 천천히 얘기하자.' },
+        { type: 'empathy',   slot: 'c', text: '뭐가 힘들었어?' },
+        { type: 'criticism', slot: 'd', text: '왜 진작 말 안 했어.' },
+      ],
+      b: [
+        { type: 'empathy',   slot: 'a', text: '응, 기다릴게. 준비되면 나와.' },
+        { type: 'avoidance', slot: 'b', text: '...알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '천천히 해.' },
+        { type: 'criticism', slot: 'd', text: '얼마나 기다려야 해.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '응, 기다릴게. 준비되면 나와.' },
+        { type: 'avoidance', slot: 'b', text: '...알겠어.' },
+        { type: 'empathy',   slot: 'c', text: '천천히 해.' },
+        { type: 'criticism', slot: 'd', text: '얼마나 기다려야 해.' },
+      ],
+      d: [
+        { type: 'empathy',   slot: 'a', text: '그 말 상처돼. 나 네 편인데.' },
+        { type: 'avoidance', slot: 'b', text: '...알겠어.' },
+        { type: 'criticism', slot: 'c', text: '그러지 마.' },
+        { type: 'avoidance', slot: 'd', text: '그래, 나도 모르겠다.' },
+      ],
+    },
+    B3: {
+      a: [
+        { type: 'empathy', text: '응, 하나씩 얘기할게. 기다려줘서 고마워.' },
+        { type: 'empathy', text: '어, 고마워.' },
+        { type: 'empathy', text: '미안했어.' },
+        { type: 'avoidance', text: '어.' },
+      ],
+      b: [
+        { type: 'empathy',   text: '응, 나올게. 미안해.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '고마워.' },
+        { type: 'avoidance', text: '알겠어.' },
+      ],
+      c: [
+        { type: 'empathy',   text: '응, 나올게. 미안해.' },
+        { type: 'avoidance', text: '어.' },
+        { type: 'empathy',   text: '고마워.' },
+        { type: 'avoidance', text: '알겠어.' },
+      ],
+      d: [
+        { type: 'empathy', text: '네 편인 거 알아. 미안해.' },
+        { type: 'empathy', text: '...미안.' },
+        { type: 'empathy', text: '나도 미안해.' },
+        { type: 'avoidance', text: '그래.' },
+      ],
     },
   },
 ];
