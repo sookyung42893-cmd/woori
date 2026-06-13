@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리 (WooRi) - 부부 관계 증진 프로그램</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- 0. 인트로 화면 -->
+  <section id="screen-intro" class="screen active">
+    <div class="card">
+      <div class="intro-logo">
+        <img src="assets/logo.png" alt="우리 WooRi">
+      </div>
+      <p class="subtitle">"너와 나의 문제가 아닌, 우리의 문제"</p>
+      <p class="desc">
+        부부 관계를 함께 가꾸는 픽셀 세계, 우리의 집에 오신 것을 환영합니다.<br>
+        우리의 선택이 모여 우리의 집을 만들어갑니다.
+      </p>
+      <button class="btn-primary" onclick="App.goTo('character')">시작하기</button>
+    </div>
+  </section>
+
+  <!-- 1. 캐릭터 생성 -->
+  <section id="screen-character" class="screen">
+    <div class="card">
+      <h2>커플 정보 입력</h2>
+      <p class="desc">나와 파트너의 이름을 입력해주세요.<br>파트너는 AI가 함께 연기합니다.</p>
+      <div class="form-row">
+        <label>나</label>
+        <input type="text" id="input-nameA" placeholder="이름 입력 (예: 민준)" maxlength="6">
+        <div class="gender-toggle" id="gender-toggle-A">
+          <button type="button" class="gender-btn active" onclick="App.selectGender('A','male')">남성</button>
+          <button type="button" class="gender-btn" onclick="App.selectGender('A','female')">여성</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>파트너 (AI)</label>
+        <input type="text" id="input-nameB" placeholder="이름 입력 (예: 서연)" maxlength="6">
+        <div class="gender-toggle" id="gender-toggle-B">
+          <button type="button" class="gender-btn" onclick="App.selectGender('B','male')">남성</button>
+          <button type="button" class="gender-btn active" onclick="App.selectGender('B','female')">여성</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="App.startGame()">우리의 집으로 입장하기</button>
+
+      <div class="link-card">
+        <p class="link-title">📱 파트너와 연동하기 (데모)</p>
+        <p class="link-desc">
+          실제 서비스에서는 파트너가 아래 코드를 자신의 앱에 입력하면, 두 사람의 데이터가 서로 연결되어
+          같은 집을 함께 가꾸고 서로의 선택을 실시간으로 확인할 수 있습니다.
+        </p>
+        <div class="invite-code" id="invite-code">WOORI-3F8B</div>
+        <button class="btn-secondary" type="button" onclick="App.simulateLink()">연동 코드 입력하기 (데모)</button>
+        <p class="link-status" id="link-status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 메인 화면 (앱 셸: 스탯바 + 탭 콘텐츠 + 하단 네비) -->
+  <section id="screen-main" class="screen">
+    <div class="card wide phone">
+      <div class="stat-topbar">
+        <div class="stat-chip"><span class="stat-icon"><img class="stat-icon-img" src="assets/icon_intimacy.png" alt="친밀도"></span><span id="top-intimacy">50</span></div>
+        <div class="stat-chip"><span class="stat-icon"><img class="stat-icon-img" src="assets/icon_communication.png" alt="소통"></span><span id="top-communication">50</span></div>
+        <div class="stat-chip"><span class="stat-icon"><img class="stat-icon-img" src="assets/icon_cooperation.png" alt="협력"></span><span id="top-cooperation">50</span></div>
+        <div class="stat-chip"><span class="stat-icon"><img class="stat-icon-img" src="assets/icon_trust.png" alt="안정감"></span><span id="top-trust">50</span></div>
+        <div class="day-badge">
+          <div>Day <span id="top-day">1</span></div>
+          <div class="weather-badge" id="top-weather">⛅ --</div>
+        </div>
+      </div>
+
+      <div id="tab-content" class="tab-content"></div>
+
+      <div class="bottom-nav">
+        <button class="nav-btn" data-tab="home" onclick="App.switchTab('home')">
+          <span class="nav-icon"><img class="nav-icon-img" src="assets/icon_nav_home.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🏠'}))"></span><span>집</span>
+        </button>
+        <button class="nav-btn" data-tab="mission" onclick="App.switchTab('mission')">
+          <span class="nav-icon"><img class="nav-icon-img" src="assets/icon_nav_mission.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🎭'}))"></span><span>상황</span>
+        </button>
+        <button class="nav-btn" data-tab="emotion" onclick="App.switchTab('emotion')">
+          <span class="nav-icon"><img class="nav-icon-img" src="assets/icon_nav_travel.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🗺️'}))"></span><span>여행</span>
+        </button>
+        <button class="nav-btn" data-tab="analysis" onclick="App.switchTab('analysis')">
+          <span class="nav-icon"><img class="nav-icon-img" src="assets/icon_nav_analysis.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'📊'}))"></span><span>분석</span>
+        </button>
+        <button class="nav-btn" data-tab="settings" onclick="App.switchTab('settings')">
+          <span class="nav-icon"><img class="nav-icon-img" src="assets/icon_nav_settings.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'⚙️'}))"></span><span>설정</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 상황극 화면 -->
+  <section id="screen-scenario" class="screen">
+    <div class="card wide phone">
+      <div class="scenario-topbar">
+        <button class="back-btn" onclick="App.exitScenario()">←</button>
+        <span class="scenario-heading" id="scenario-heading"></span>
+      </div>
+
+      <div class="scene-illustration" id="scene-illustration">
+        <img class="scene-char-img char-a" id="scene-charA" src="assets/char_husband.png" alt="">
+        <img class="scene-char-img char-b" id="scene-charB" src="assets/char_wife.png" alt="">
+        <div class="scene-bubble">💬</div>
+      </div>
+
+      <div class="scene-names">
+        <span id="scene-nameA"></span>
+        <span id="scene-nameB"></span>
+      </div>
+
+      <div class="dialogue-log" id="dialogue-log"></div>
+
+      <div class="turn-prompt" id="turn-prompt"></div>
+
+      <div class="choice-list" id="choice-list"></div>
+
+      <div class="thinking-box" id="thinking-box">
+        <span class="thinking-dots">파트너가 응답을 작성하고 있어요</span>
+      </div>
+
+      <button class="btn-primary hidden" id="next-turn-btn" onclick="App.proceedAfterReply()">다음</button>
+    </div>
+  </section>
+
+  <!-- 4. 결과 화면 -->
+  <section id="screen-result" class="screen">
+    <div class="card wide phone">
+      <h2 class="result-title">결과</h2>
+      <div class="result-illustration" id="result-illustration"></div>
+      <div class="result-summary" id="result-summary"></div>
+      <div class="result-stats" id="result-stats"></div>
+      <div class="result-room" id="result-room"></div>
+      <button class="btn-primary" onclick="App.applyResultsAndGoHome()">확인</button>
+    </div>
+  </section>
+
+  <!-- 5. 사랑지도 질문 화면 -->
+  <section id="screen-lovemap" class="screen">
+    <div class="card wide phone">
+      <div class="scenario-topbar">
+        <button class="back-btn" onclick="App.exitLoveMap()">←</button>
+        <span class="scenario-heading">사랑지도 여행</span>
+      </div>
+      <div class="lovemap-progress" id="lovemap-progress"></div>
+      <div id="lovemap-body"></div>
+    </div>
+  </section>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
