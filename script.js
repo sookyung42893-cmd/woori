@@ -17,16 +17,78 @@ const AI_RESPONSE_WEIGHTS = {
 
 const TURN_ORDER = ['A1', 'B1', 'A2', 'B2', 'A3', 'B3'];
 
-// 각 턴/선택유형을 대화 패턴 분석 카테고리로 매핑
-// A턴(스스로 꺼낸 말)의 비난/공감 vs B턴(상대 말에 대한 반응)의 방어/협력
-const PATTERN_CATEGORY = {
-  A1: { empathy: '공감', criticism: '비난', avoidance: '회피' },
-  A2: { empathy: '공감', criticism: '비난', avoidance: '회피' },
-  A3: { empathy: '공감', criticism: '비난', avoidance: '회피' },
-  B1: { empathy: '협력', criticism: '방어', avoidance: '회피' },
-  B2: { empathy: '협력', criticism: '방어', avoidance: '회피' },
-  B3: { empathy: '협력', criticism: '방어', avoidance: '회피' },
+// 각 선택지를 Gottman/Bowen 분석 태그로 매핑하는 규칙 테이블
+// (turn side: A턴=스스로 꺼낸 말, B턴=상대 말에 대한 반응) + type + slot 기준
+const PATTERN_TAGS = {
+  A: {
+    empathy: {
+      a: { gottman: '공감', bowen: ['분화된반응', '직접표현'] },
+      b: { gottman: '공감', bowen: ['직접표현'] },
+      c: { gottman: '공감', bowen: ['직접표현'] },
+      d: { gottman: '공감', bowen: ['직접표현'] },
+    },
+    avoidance: {
+      a: { gottman: '중립', bowen: [] },
+      b: { gottman: '중립', bowen: ['간접표현'] },
+      c: { gottman: '담쌓기', bowen: ['정서적단절'] },
+      d: { gottman: '담쌓기', bowen: ['정서적단절'] },
+    },
+    criticism: {
+      a: { gottman: '비난', bowen: ['정서적융합'] },
+      b: { gottman: '비난', bowen: ['정서적융합', '간접표현'] },
+      c: { gottman: '비난', bowen: ['정서적융합', '간접표현'] },
+      d: { gottman: '비난', bowen: ['정서적융합'] },
+    },
+    default: {
+      empathy: { gottman: '공감', bowen: ['직접표현'] },
+      avoidance: { gottman: '중립', bowen: [] },
+      criticism: { gottman: '비난', bowen: ['정서적융합'] },
+    },
+  },
+  B: {
+    empathy: {
+      a: { gottman: '공감', bowen: ['분화된반응', '직접표현'] },
+      b: { gottman: '공감', bowen: ['직접표현'] },
+      c: { gottman: '공감', bowen: ['직접표현'] },
+      d: { gottman: '공감', bowen: ['직접표현'] },
+    },
+    avoidance: {
+      a: { gottman: '중립', bowen: [] },
+      b: { gottman: '중립', bowen: ['간접표현'] },
+      c: { gottman: '담쌓기', bowen: ['정서적단절'] },
+      d: { gottman: '담쌓기', bowen: ['정서적단절'] },
+    },
+    criticism: {
+      a: { gottman: '방어', bowen: ['정서적융합'] },
+      b: { gottman: '방어', bowen: ['정서적융합', '간접표현'] },
+      c: { gottman: '방어', bowen: ['정서적융합', '간접표현'] },
+      d: { gottman: '방어', bowen: ['정서적융합'] },
+    },
+    default: {
+      empathy: { gottman: '공감', bowen: ['직접표현'] },
+      avoidance: { gottman: '중립', bowen: [] },
+      criticism: { gottman: '방어', bowen: ['정서적융합', '간접표현'] },
+    },
+  },
 };
+
+// 텍스트 기반 override - 의미가 애매한 침묵/회피류 선택지를 별도 지정
+const BOWEN_TEXT_OVERRIDES = {
+  '(아무 말 없이 기다린다)': { gottman: '중립', bowen: ['분화된반응'] },
+  '...(아무 말 없이 기다린다)': { gottman: '중립', bowen: ['분화된반응'] },
+  '… (침묵 유지)': { gottman: '담쌓기', bowen: ['정서적단절'] },
+  '(눈치 못 채고 각자 핸드폰)': { gottman: '담쌓기', bowen: ['정서적단절'] },
+  '...됐어. (방으로 들어감)': { gottman: '담쌓기', bowen: ['정서적단절'] },
+  '(그냥 둔다)': { gottman: '중립', bowen: ['정서적단절'] },
+};
+
+// 선택지 하나의 Gottman/Bowen 태그를 derive
+function derivePatternTags(option, turnKey) {
+  if (BOWEN_TEXT_OVERRIDES[option.text]) return BOWEN_TEXT_OVERRIDES[option.text];
+  const side = turnKey[0]; // 'A' | 'B'
+  const sideTable = PATTERN_TAGS[side];
+  return (option.slot && sideTable[option.type][option.slot]) || sideTable.default[option.type];
+}
 
 const TURN_PROMPT = {
   A1: (n, situation) => `${situation}\n\n${n.A}님, 어떻게 반응할까요?`,
@@ -89,16 +151,16 @@ const SCENARIO_POOL = [
         { type: 'criticism', slot: 'd', text: '맨날 지쳐서라고 하면 어떡해.' },
       ],
       b: [
-        { type: 'empathy',   slot: 'a', text: '아니야, 같이 하자.' },
-        { type: 'avoidance', slot: 'b', text: '그래? 그럼 부탁할게.' },
-        { type: 'empathy',   slot: 'c', text: '괜찮아?' },
-        { type: 'criticism', slot: 'd', text: '처음부터 그랬으면 됐잖아.' },
-      ],
-      c: [
         { type: 'empathy',   slot: 'a', text: '언제 할 것 같아? 나도 도울게.' },
         { type: 'avoidance', slot: 'b', text: '알겠어.' },
         { type: 'empathy',   slot: 'c', text: '그럼 같이 나중에 하자.' },
         { type: 'criticism', slot: 'd', text: '나중에가 언제야.' },
+      ],
+      c: [
+        { type: 'empathy',   slot: 'a', text: '아니야, 같이 하자.' },
+        { type: 'avoidance', slot: 'b', text: '그래? 그럼 부탁할게.' },
+        { type: 'empathy',   slot: 'c', text: '괜찮아?' },
+        { type: 'criticism', slot: 'd', text: '처음부터 그랬으면 됐잖아.' },
       ],
       d: [
         { type: 'empathy',   slot: 'a', text: '화난 게 아니야. 같이 하자고.' },
@@ -565,10 +627,10 @@ const SCENARIO_POOL = [
         { type: 'criticism', slot: 'd', text: '억지로 가기 싫어.' },
       ],
       c: [
-        { type: 'empathy',   slot: 'a', text: '그럴까? 잠깐만 나가는 거면 괜찮아.' },
-        { type: 'avoidance', slot: 'b', text: '…그래.' },
-        { type: 'avoidance', slot: 'c', text: '가까운 데만?' },
-        { type: 'criticism', slot: 'd', text: '억지로 가기 싫어.' },
+        { type: 'empathy',   slot: 'a', text: '좋아, 그러자.' },
+        { type: 'avoidance', slot: 'b', text: '음… 그래.' },
+        { type: 'empathy',   slot: 'c', text: '카페나 공원 정도?' },
+        { type: 'empathy',   slot: 'd', text: '미안, 그렇게 말할 의도는 아니었어.' },
       ],
       d: [
         { type: 'empathy',   slot: 'a', text: '허락이 아니라 같이 가고 싶어서 물어본 거야.' },
@@ -716,7 +778,7 @@ const SCENARIO_POOL = [
         { type: 'empathy',   slot: 'a', text: '응, 말해. 내가 들을게.' },
         { type: 'avoidance', slot: 'b', text: '어… 응.' },
         { type: 'avoidance', slot: 'c', text: '잠깐만.' },
-        { type: 'avoidance', slot: 'd', text: '지금 좀 힘들어.' },
+        { type: 'criticism', slot: 'd', text: '지금 좀 힘들어.' },
       ],
       d: [
         { type: 'empathy',   slot: 'a', text: '맞아, 나도 표현을 못 했네. 오늘 어땠어?' },
@@ -1277,10 +1339,10 @@ const SCENARIO_POOL = [
         { type: 'criticism', slot: 'd', text: '필요한 거면 미리 말하지.' },
       ],
       c: [
-        { type: 'empathy',   slot: 'a', text: '스트레스 받았구나. 뭔 일이야?' },
-        { type: 'criticism', slot: 'b', text: '그래도 미리 말해줬으면 했어.' },
-        { type: 'empathy',   slot: 'c', text: '많이 힘들었어?' },
-        { type: 'criticism', slot: 'd', text: '스트레스가 이유가 돼?' },
+        { type: 'empathy',   slot: 'a', text: '응, 꽤 많이 나왔어. 같이 한번 보자.' },
+        { type: 'avoidance', slot: 'b', text: '음… 그래.' },
+        { type: 'empathy',   slot: 'c', text: '그렇게 말하면 나도 서운해.' },
+        { type: 'criticism', slot: 'd', text: '그냥 쓰는 거면 안 되지.' },
       ],
       d: [
         { type: 'empathy',   slot: 'a', text: '따지는 게 아니야. 같이 관리하고 싶어서.' },
@@ -1701,6 +1763,8 @@ const state = {
   scenario: null,
   dialogueLog: [],
   choiceTypes: {},
+  choiceSlots: {},
+  choiceTags: {},
   lastDeltas: null,
   todayMission: null,
   todayMissionDay: 0,
@@ -1722,9 +1786,6 @@ const state = {
     },
   },
 
-  patternCounts: { 공감: 0, 협력: 0, 비난: 0, 방어: 0, 회피: 0 },
-  patternCountsA: { 공감: 0, 비난: 0, 회피: 0 },
-  patternCountsB: { 협력: 0, 방어: 0, 회피: 0 },
   scenarioHistory: [],
 };
 
@@ -2024,7 +2085,7 @@ const App = {
     for (let i = state.scenarioHistory.length - 1; i >= 0; i--) {
       const entry = state.scenarioHistory[i];
       for (const turnKey of TURN_ORDER) {
-        if (PATTERN_CATEGORY[turnKey][entry.choiceTypes[turnKey]] === category) {
+        if (entry.choiceTags[turnKey].gottman === category) {
           return entry.title;
         }
       }
@@ -2032,43 +2093,104 @@ const App = {
     return null;
   },
 
+  computeAnalysis() {
+    const history = state.scenarioHistory;
+    const total = history.length * TURN_ORDER.length;
+    if (total === 0) return null;
+
+    const gCounts = { 공감: 0, 비난: 0, 방어: 0, 경멸: 0, 담쌓기: 0, 중립: 0 };
+    const gCountsA = { 공감: 0, 비난: 0, 담쌓기: 0, 중립: 0 };
+    const gCountsB = { 공감: 0, 방어: 0, 담쌓기: 0, 중립: 0 };
+    const bCounts = { 분화된반응: 0, 정서적융합: 0, 정서적단절: 0, 직접표현: 0, 간접표현: 0 };
+
+    history.forEach(entry => {
+      TURN_ORDER.forEach(turnKey => {
+        const tag = entry.choiceTags[turnKey];
+        gCounts[tag.gottman]++;
+        (turnKey[0] === 'A' ? gCountsA : gCountsB)[tag.gottman]++;
+        tag.bowen.forEach(b => bCounts[b]++);
+      });
+    });
+
+    /* ----- Gottman ----- */
+    const 비난율 = Math.round(gCounts.비난 / total * 100);
+    const 방어율 = Math.round(gCounts.방어 / total * 100);
+    const 경멸율 = Math.round(gCounts.경멸 / total * 100);
+    const 담쌓기율 = Math.round(gCounts.담쌓기 / total * 100);
+    const positive = gCounts.공감;
+    const negative = gCounts.비난 + gCounts.방어 + gCounts.경멸 + gCounts.담쌓기;
+    const ratioText = negative === 0
+      ? `${positive}:0 (5:1 이상 충족)`
+      : `${(positive / negative).toFixed(1)}:1`;
+    const negPatterns = { 비난: 비난율, 방어: 방어율, 경멸: 경멸율, 담쌓기: 담쌓기율 };
+    const dominantPattern = Object.entries(negPatterns).sort((a, b) => b[1] - a[1])[0][0];
+
+    /* ----- Bowen ----- */
+    const 분화된반응비율 = Math.round(bCounts.분화된반응 / total * 100);
+    const 정서적융합비율 = Math.round(bCounts.정서적융합 / total * 100);
+    const 정서적단절비율 = Math.round(bCounts.정서적단절 / total * 100);
+    const directTotal = bCounts.직접표현 + bCounts.간접표현;
+    const 직접의사소통비율 = directTotal === 0 ? null : Math.round(bCounts.직접표현 / directTotal * 100);
+
+    let differentiationScore;
+    if (직접의사소통비율 === null) {
+      differentiationScore = 분화된반응비율 * (0.4 / 0.7)
+        + (100 - 정서적융합비율) * (0.15 / 0.7)
+        + (100 - 정서적단절비율) * (0.15 / 0.7);
+    } else {
+      differentiationScore = 분화된반응비율 * 0.4
+        + 직접의사소통비율 * 0.3
+        + (100 - 정서적융합비율) * 0.15
+        + (100 - 정서적단절비율) * 0.15;
+    }
+    differentiationScore = Math.round(differentiationScore);
+
+    let dominantTendency;
+    if (differentiationScore >= 70) dominantTendency = '분화';
+    else if (differentiationScore < 40) dominantTendency = 정서적융합비율 >= 정서적단절비율 ? '융합' : '단절';
+    else dominantTendency = '균형';
+
+    /* ----- 개인 패턴 ----- */
+    const aDominant = Object.entries(gCountsA).sort((x, y) => y[1] - x[1])[0][0];
+    const bDominant = Object.entries(gCountsB).sort((x, y) => y[1] - x[1])[0][0];
+
+    return {
+      total,
+      gottman: { 비난율, 방어율, 경멸율, 담쌓기율, positive, negative, ratioText, negPatterns, dominantPattern },
+      bowen: { 분화된반응비율, 정서적융합비율, 정서적단절비율, 직접의사소통비율, differentiationScore, dominantTendency },
+      individual: { aDominant, bDominant },
+    };
+  },
+
   renderAnalysisTab() {
     const n = state.names;
-    const counts = state.patternCounts;
-    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    const analysis = this.computeAnalysis();
 
-    if (total === 0) {
+    if (!analysis) {
       return `
         <div class="home-title">우리의 대화 패턴 분석</div>
         <div class="home-message">아직 분석할 대화 기록이 없어요. "상황" 탭에서 상황극을 진행하면 우리의 대화 패턴이 차곡차곡 쌓여요.</div>
       `;
     }
 
-    /* ----- Gottman 지표 ----- */
-    const positive = counts.공감 + counts.협력;
-    const negative = counts.비난 + counts.방어;
-    const negPatterns = {
-      비난: Math.round(counts.비난 / total * 100),
-      방어: Math.round(counts.방어 / total * 100),
-      경멸: 0,
-      담쌓기: Math.round(counts.회피 / total * 100),
-    };
-    const dominantPattern = Object.entries(negPatterns).sort((a, b) => b[1] - a[1])[0][0];
-    const ratioText = negative === 0 ? `${positive}:0` : `${(positive / negative).toFixed(1)}:1`;
+    const { gottman, bowen } = analysis;
+    const { 비난율, 방어율, 경멸율, 담쌓기율, positive, negative, ratioText, negPatterns, dominantPattern } = gottman;
+    const { 분화된반응비율, 정서적융합비율, 정서적단절비율, 직접의사소통비율, differentiationScore, dominantTendency } = bowen;
 
+    /* ----- Gottman 피드백 ----- */
     const gottmanSentences = [];
     if (positive > 0) {
-      gottmanSentences.push(`따뜻한 공감과 협력의 순간이 ${positive}번 있었어요. 갈등 속에서도 서로를 향한 마음이 남아있다는 신호예요.`);
+      gottmanSentences.push(`따뜻한 공감의 순간이 ${positive}번 있었어요. 갈등 속에서도 서로를 향한 마음이 남아있다는 신호예요.`);
     } else {
-      gottmanSentences.push('아직 공감이나 협력의 순간이 뚜렷하게 나타나진 않았지만, 지금부터 하나씩 만들어갈 수 있어요.');
+      gottmanSentences.push('아직 공감의 순간이 뚜렷하게 나타나진 않았지만, 지금부터 하나씩 만들어갈 수 있어요.');
     }
     if (negPatterns[dominantPattern] > 0) {
-      const exampleTitle = dominantPattern !== '경멸' ? this.findExampleSituation(dominantPattern) : null;
+      const exampleTitle = this.findExampleSituation(dominantPattern);
       const exampleText = exampleTitle ? ` 특히 "${exampleTitle}" 상황에서 이런 모습이 나타났어요.` : '';
       const dominantMsgMap = {
         비난: `대화에서 감정이 먼저 앞서는 순간들이 있었어요.${exampleText} 나쁜 게 아니라 그만큼 기대가 크다는 뜻이기도 해요.`,
         방어: `상대의 말에 방어적으로 반응하는 패턴이 보였어요.${exampleText} 방어는 자신을 지키려는 자연스러운 반응이에요.`,
-        경멸: '현재까지의 대화에서는 경멸의 표현이 뚜렷하게 나타나지 않았어요.',
+        경멸: `상대를 깎아내리는 듯한 말투가 보였어요.${exampleText} 서로를 존중하는 표현으로 바꿔보면 분위기가 한결 달라질 거예요.`,
         담쌓기: `대화를 잠시 닫아두는 방식이 자주 나타났어요.${exampleText} 때로는 잠시 멈추는 것도 필요하지만, 작은 반응 하나가 생각보다 큰 연결을 만들어요.`,
       };
       gottmanSentences.push(dominantMsgMap[dominantPattern]);
@@ -2082,24 +2204,34 @@ const App = {
     }
     const gottmanFeedback = gottmanSentences.join(' ');
 
-    /* ----- Bowen 지표 ----- */
-    const directExpressionRate = Math.round((total - counts.회피) / total * 100);
-    const autonomyScore = Math.round(state.stats.boundary);
-    const fusionScore = 100 - autonomyScore;
-    const differentiationScore = autonomyScore;
-
+    /* ----- Bowen 피드백 ----- */
     const bowenSentences = [];
     if (differentiationScore >= 70) {
-      bowenSentences.push('각자의 공간을 존중하는 패턴이 강하게 나타났어요. 독립적인 관계는 건강하지만, 가끔은 연결을 먼저 시도하는 것도 관계에 온기를 더해줄 수 있어요. 파트너가 "우리 사이에 거리가 생겼나" 하고 느낄 수 있어요.');
-    } else if (differentiationScore <= 30) {
-      bowenSentences.push('파트너와 함께하고 싶은 마음이 크게 나타났어요. 연결을 원하는 건 자연스럽고 아름다운 감정이에요. 다만 때로는 각자의 공간을 허용하는 것도 관계를 더 풍요롭게 만들어요.');
+      bowenSentences.push(`자아분화종합점수는 ${differentiationScore}점으로, 서로 다른 의견 속에서도 차분하게 자기 생각을 지키는 모습이 돋보여요. 건강한 분화의 신호예요.`);
+    } else if (differentiationScore < 40) {
+      if (dominantTendency === '융합') {
+        bowenSentences.push(`자아분화종합점수는 ${differentiationScore}점으로, 상대의 감정에 깊이 휩쓸리거나 맞춰주려는 경향이 두드러져요. 가끔은 "나는 이렇게 생각해"라고 자신의 입장을 먼저 말해보는 것도 좋아요.`);
+      } else {
+        bowenSentences.push(`자아분화종합점수는 ${differentiationScore}점으로, 갈등 상황에서 서로 거리를 두는 경향이 두드러져요. 작은 대화 한 번이 그 거리를 좁히는 첫걸음이 될 수 있어요.`);
+      }
     } else {
-      bowenSentences.push('자율성과 연결 사이에서 비교적 균형 잡힌 모습이 나타나고 있어요. 지금처럼 서로의 공간과 마음을 함께 존중해 나가면 좋겠어요.');
+      bowenSentences.push(`자아분화종합점수는 ${differentiationScore}점으로, 보통 수준이에요. 연결과 자율성 사이에서 비교적 균형을 찾아가고 있어요.`);
     }
-    if (directExpressionRate < 50) {
-      bowenSentences.push('마음을 직접 표현하기보다 한 걸음 물러서는 경향이 보였어요. "나는 이게 필요해"라고 직접 말하는 연습이 관계를 더 명확하게 만들어줄 거예요.');
+    if (정서적융합비율 >= 40) {
+      bowenSentences.push('상대의 감정에 쉽게 동화되는 모습이 자주 나타났어요. 함께 느끼는 마음은 소중하지만, 자신의 생각도 함께 표현해보면 더 좋아요.');
+    }
+    if (정서적단절비율 >= 40) {
+      bowenSentences.push('갈등이 생기면 마음의 문을 닫는 모습이 자주 나타났어요. 짧은 한마디라도 먼저 건네보는 연습이 도움이 될 수 있어요.');
+    }
+    if (직접의사소통비율 === null) {
+      bowenSentences.push('아직 직접적인 의사소통 데이터가 충분하지 않아요. 다양한 상황극을 진행하면 더 정확한 분석이 가능해요.');
+    } else if (직접의사소통비율 < 50) {
+      bowenSentences.push(`직접적인 의사소통 비율은 ${직접의사소통비율}%예요. "나는 ~을 원해"처럼 마음을 직접 표현하는 연습이 관계를 더 명확하게 만들어줄 거예요.`);
     } else {
-      bowenSentences.push('필요한 순간에 마음을 직접 표현하는 모습이 자주 나타났어요. 이런 솔직함이 서로를 더 잘 이해하게 도와줘요.');
+      bowenSentences.push(`직접적인 의사소통 비율은 ${직접의사소통비율}%예요. 필요한 순간에 마음을 직접 표현하는 모습이 자주 나타났어요. 이런 솔직함이 서로를 더 잘 이해하게 도와줘요.`);
+    }
+    if (분화된반응비율 < 30) {
+      bowenSentences.push('차분하게 자기 생각을 지키며 반응하는 순간이 아직은 적었어요. 감정이 격해질 때 잠시 숨을 고르고 반응해보는 것도 도움이 될 수 있어요.');
     }
     const bowenFeedback = bowenSentences.join(' ');
 
@@ -2113,11 +2245,12 @@ const App = {
     else if (houseAvg >= 20) houseMessage = '집에 균열이 생기고 있어요. 지금 우리 관계가 회복이 필요하다는 신호예요.';
     else houseMessage = '집이 많이 어두워졌어요. 지금 가장 필요한 건 작은 대화 한 번이에요.';
 
-    let overallFeedback = `${gottmanSentences[0]} Gottman 지표로 보면 지금 우리의 긍정:부정 교류 비율은 ${ratioText} 수준이고, Bowen 지표로 보면 서로의 공간과 연결 사이의 균형 점수는 ${differentiationScore}점이에요. ${houseMessage} 이 숫자들은 평가가 아니라, 지금 우리가 어디쯤 있는지 비춰주는 거울일 뿐이에요.`;
+    let overallFeedback = `${gottmanSentences[0]} Gottman 지표로 보면 지금 우리의 긍정:부정 교류 비율은 ${ratioText} 수준이고, Bowen 지표로 보면 자아분화종합점수는 ${differentiationScore}점이에요. ${houseMessage} 이 숫자들은 평가가 아니라, 지금 우리가 어디쯤 있는지 비춰주는 거울일 뿐이에요.`;
 
     const allStatsLow = statValues.every(v => v <= 20);
-    const allNegative = negative === total;
-    if (allStatsLow && allNegative) {
+    const allGottmanNegHigh = 비난율 >= 40 && 방어율 >= 40 && 담쌓기율 >= 40;
+    const bothBowenHigh = 정서적단절비율 >= 70 && 정서적융합비율 >= 70;
+    if (allStatsLow && allGottmanNegHigh && bothBowenHigh) {
       overallFeedback += ' 지금 관계가 많이 힘드신 것 같아요. 전문 상담사와 함께 이야기 나눠보시는 것도 좋은 선택이에요.';
     }
 
@@ -2127,23 +2260,26 @@ const App = {
       경멸: '파트너가 좋아하는 것 한 가지를 떠올리고, 그걸 말로 표현해봐요.',
       담쌓기: '오늘 저녁, 파트너에게 "오늘 어땠어?"라고 한 번만 먼저 물어봐요.',
     };
-    let actionSuggestion = actionMap[dominantPattern] || actionMap.담쌓기;
-    if (directExpressionRate < 50 && dominantPattern !== '비난') {
-      actionSuggestion = '이번 주에 파트너가 혼자 있고 싶어할 때 한 번 기다려봐요.';
+    let actionSuggestion = negPatterns[dominantPattern] > 0 ? actionMap[dominantPattern] : null;
+    if (!actionSuggestion) {
+      actionSuggestion = 직접의사소통비율 !== null && 직접의사소통비율 < 50
+        ? '이번 주에 마음속에 있는 작은 바람을 한 가지 말로 표현해봐요.'
+        : '오늘 파트너에게 고마웠던 점 한 가지를 말해봐요.';
     }
 
     /* ----- 개인 패턴 ----- */
-    const aDominant = Object.entries(state.patternCountsA).sort((x, y) => y[1] - x[1])[0][0];
-    const bDominant = Object.entries(state.patternCountsB).sort((x, y) => y[1] - x[1])[0][0];
+    const { aDominant, bDominant } = analysis.individual;
     const feedbackMapA = {
-      공감: `자신의 마음을 꺼낼 때 상대의 감정을 먼저 살피는 표현을 선택하는 경향이 보여요. 이런 시도가 대화의 분위기를 부드럽게 만들어요.`,
-      비난: `서운한 마음이 들 때 감정이 먼저 표현되는 경향이 보여요. 그만큼 솔직한 마음이 있다는 뜻으로도 볼 수 있어요.`,
-      회피: `갈등이 생기면 한 걸음 물러서는 방식을 선택하는 경향이 보여요. 잠시 멈추는 것도 자신을 보호하는 방법 중 하나예요.`,
+      공감: '자신의 마음을 꺼낼 때 상대의 감정을 먼저 살피는 표현을 선택하는 경향이 보여요. 이런 시도가 대화의 분위기를 부드럽게 만들어요.',
+      비난: '서운한 마음이 들 때 감정이 먼저 표현되는 경향이 보여요. 그만큼 솔직한 마음이 있다는 뜻으로도 볼 수 있어요.',
+      담쌓기: '갈등이 생기면 대화를 잠시 닫아두는 방식을 선택하는 경향이 보여요. 짧은 한마디라도 먼저 건네보면 분위기가 달라질 수 있어요.',
+      중립: '갈등 상황에서 한 걸음 물러나 지켜보는 방식을 선택하는 경향이 보여요. 잠시 멈추는 것도 자신을 보호하는 방법 중 하나예요.',
     };
     const feedbackMapB = {
-      협력: `상대의 말에 협력적으로 반응하는 경향이 보여요. 이런 반응이 갈등을 키우지 않고 대화를 이어가게 해줘요.`,
-      방어: `지적받는 느낌이 들 때 자신을 설명하거나 방어하는 표현이 먼저 나오는 경향이 보여요. 이건 자신을 지키려는 자연스러운 반응이에요.`,
-      회피: `상황이 무거워지면 잠시 거리를 두는 방식을 선택하는 경향이 보여요. 혼자만의 시간이 필요한 신호일 수 있어요.`,
+      공감: '상대의 말에 공감하며 반응하는 경향이 보여요. 이런 반응이 갈등을 키우지 않고 대화를 이어가게 해줘요.',
+      방어: '지적받는 느낌이 들 때 자신을 설명하거나 방어하는 표현이 먼저 나오는 경향이 보여요. 이건 자신을 지키려는 자연스러운 반응이에요.',
+      담쌓기: '상황이 무거워지면 대화를 잠시 닫아두는 방식을 선택하는 경향이 보여요. 혼자만의 시간이 필요한 신호일 수 있어요.',
+      중립: '상황이 무거워지면 잠시 거리를 두고 지켜보는 방식을 선택하는 경향이 보여요. 혼자만의 시간이 필요한 신호일 수 있어요.',
     };
 
     return `
@@ -2165,29 +2301,43 @@ const App = {
       </div>
 
       <div class="analysis-chart">
-        <div class="analysis-section-title">Bowen 지표 · 자율성과 연결의 균형</div>
+        <div class="analysis-section-title">Bowen 지표 · 자아분화</div>
         <div class="analysis-row">
-          <span class="analysis-label">자율성</span>
+          <span class="analysis-label">자아분화</span>
           <div class="analysis-bar-track">
-            <div class="analysis-bar-fill" style="width:${autonomyScore}%; background:#7eb6e0;"></div>
+            <div class="analysis-bar-fill" style="width:${differentiationScore}%; background:#7eb6e0;"></div>
           </div>
-          <span class="analysis-count">${autonomyScore}</span>
+          <span class="analysis-count">${differentiationScore}점</span>
         </div>
         <div class="analysis-row">
-          <span class="analysis-label">융합</span>
+          <span class="analysis-label">정서적 융합</span>
           <div class="analysis-bar-track">
-            <div class="analysis-bar-fill" style="width:${fusionScore}%; background:#e0a87a;"></div>
+            <div class="analysis-bar-fill" style="width:${정서적융합비율}%; background:#e0a87a;"></div>
           </div>
-          <span class="analysis-count">${fusionScore}</span>
+          <span class="analysis-count">${정서적융합비율}%</span>
         </div>
         <div class="analysis-row">
-          <span class="analysis-label">직접표현</span>
+          <span class="analysis-label">정서적 단절</span>
           <div class="analysis-bar-track">
-            <div class="analysis-bar-fill" style="width:${directExpressionRate}%; background:#8fc99b;"></div>
+            <div class="analysis-bar-fill" style="width:${정서적단절비율}%; background:#c9a98a;"></div>
           </div>
-          <span class="analysis-count">${directExpressionRate}%</span>
+          <span class="analysis-count">${정서적단절비율}%</span>
         </div>
-        <div class="analysis-ratio">분화 균형 점수 — ${differentiationScore}점 (50점에 가까울수록 균형적)</div>
+        <div class="analysis-row">
+          <span class="analysis-label">직접적 의사소통</span>
+          <div class="analysis-bar-track">
+            <div class="analysis-bar-fill" style="width:${직접의사소통비율 ?? 0}%; background:#8fc99b;"></div>
+          </div>
+          <span class="analysis-count">${직접의사소통비율 === null ? '데이터부족' : `${직접의사소통비율}%`}</span>
+        </div>
+        <div class="analysis-row">
+          <span class="analysis-label">분화된 반응</span>
+          <div class="analysis-bar-track">
+            <div class="analysis-bar-fill" style="width:${분화된반응비율}%; background:#c5b8a5;"></div>
+          </div>
+          <span class="analysis-count">${분화된반응비율}%</span>
+        </div>
+        <div class="analysis-ratio">자아분화종합점수 — ${differentiationScore}점 (${dominantTendency})</div>
         <div class="analysis-feedback">${bowenFeedback}</div>
       </div>
 
@@ -2247,9 +2397,6 @@ const App = {
         jeju: { answeredCount: 0, answers: [] },
       },
     };
-    state.patternCounts = { 공감: 0, 협력: 0, 비난: 0, 방어: 0, 회피: 0 };
-    state.patternCountsA = { 공감: 0, 비난: 0, 회피: 0 };
-    state.patternCountsB = { 협력: 0, 방어: 0, 회피: 0 };
     state.scenarioHistory = [];
     document.getElementById('input-nameA').value = '';
     document.getElementById('input-nameB').value = '';
@@ -2266,6 +2413,7 @@ const App = {
     state.dialogueLog = [];
     state.choiceTypes = {};
     state.choiceSlots = {};
+    state.choiceTags = {};
 
     const n = state.names;
     document.getElementById('scene-nameA').textContent = n.A;
@@ -2344,6 +2492,7 @@ const App = {
     const chosen = options[idx];
     state.choiceTypes[turnKey] = chosen.type;
     state.choiceSlots[turnKey] = chosen.slot;
+    state.choiceTags[turnKey] = derivePatternTags(chosen, turnKey);
     state.dialogueLog.push({ speaker: 'A', text: chosen.text });
 
     this.renderDialogueLog();
@@ -2363,6 +2512,7 @@ const App = {
       const aiChoice = weightedPick(aiOptions, AI_RESPONSE_WEIGHTS[chosen.type]);
       state.choiceTypes[aiTurnKey] = aiChoice.type;
       state.choiceSlots[aiTurnKey] = aiChoice.slot;
+      state.choiceTags[aiTurnKey] = derivePatternTags(aiChoice, aiTurnKey);
       state.dialogueLog.push({ speaker: 'B', text: aiChoice.text });
       this.renderDialogueLog();
 
@@ -2385,16 +2535,10 @@ const App = {
     const counts = { empathy: 0, criticism: 0, avoidance: 0 };
     types.forEach(t => counts[t]++);
 
-    state.scenarioHistory.push({ title: state.scenario.title, choiceTypes: { ...state.choiceTypes } });
-
-    TURN_ORDER.forEach(turnKey => {
-      const category = PATTERN_CATEGORY[turnKey][state.choiceTypes[turnKey]];
-      state.patternCounts[category]++;
-      if (turnKey[0] === 'A') {
-        state.patternCountsA[category]++;
-      } else {
-        state.patternCountsB[category]++;
-      }
+    state.scenarioHistory.push({
+      title: state.scenario.title,
+      choiceTypes: { ...state.choiceTypes },
+      choiceTags: { ...state.choiceTags },
     });
 
     const deltas = { intimacy: 0, trust: 0, cooperation: 0, communication: 0, boundary: 0 };
